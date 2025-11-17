@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { query } from "@/lib/db";
-
+// import { query } from "@/lib/db";
+import { users } from "@/app/userdata";
 // POST request: login or create user
 export async function POST(req: Request) {
   try {
@@ -11,17 +11,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Email and password are required" }, { status: 400 });
     }
 
-    // Query the database (replace with password hashing in production!)
-    const result = await query(
-      "SELECT id, email, full_name FROM users WHERE email = $1 AND password_hash = $2",
-      [email, password]
+    const result = users.find(
+      (user: { email: string; password_hash: string; }) => user.email === email && user.password_hash === password
     );
 
-    if (result.rows.length > 0) {
-      //return success response
-      return NextResponse.json({ ...result.rows[0], success: true });
+    if (result) {
+      const { password_hash, ...userWithoutPassword } = result;
+      return NextResponse.json({ result: userWithoutPassword, success: true });
     } else {
-      //return error response
       return NextResponse.json(
         { message: "Invalid credentials", success: false },
         { status: 401 }
