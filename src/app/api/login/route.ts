@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     // Query the database (replace with password hashing in production!)
     const result = await query(
-      "SELECT id, email, role FROM test_user WHERE email = $1 AND password = $2",
+      "SELECT id, email, full_name FROM users WHERE email = $1 AND password_hash = $2",
       [email, password]
     );
 
